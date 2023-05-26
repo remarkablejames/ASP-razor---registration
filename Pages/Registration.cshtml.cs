@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Text.Json;
+
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using AcademicManagement;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +8,7 @@ namespace Lab2.Pages;
 
 public class Registration : PageModel
 {
+    private readonly string dataFilePath = "./data/academic_records.json";
     // public string[] Students = new string[5] { "James", "John", "Jane", "Jill", "Jack" };
     public List<Student> Students = DataAccess.GetAllStudents();
     public List<Course> Courses = DataAccess.GetAllCourses();
@@ -19,18 +19,10 @@ public class Registration : PageModel
     public string SelectedStudentId { get; set; }
    
     public List<SelectListItem> StudentOptions { get; set; }
-    
-    // public IActionResult OnGetHandleStudentSelection(string selectedStudentId, string selectedStudentName)
-    // {
-    //     // Handle the selected student
-    //     // You can access the selectedStudentId and selectedStudentName parameters here
-    //     // Perform any necessary logic or operations based on the selected student
-    //     Console.WriteLine("Selected student ID: " + selectedStudentId);
-    //     return RedirectToPage("Index");
-    // }
-    
-    public IActionResult OnGet(string selectedStudentId)
+
+    public IActionResult OnGet(string selectedStudentId, AcademicRecord message)
     {
+         Console.WriteLine("GET" + message.CourseCode);
         StudentOptions = Students.Select(s => new SelectListItem { Value = s.StudentId, Text = s.StudentName }).ToList();
 
         // Set the selectedStudentId property based on the query parameter value
@@ -51,32 +43,23 @@ public class Registration : PageModel
     public IActionResult OnPostRegister()
     {
         var selectedValues = Request.Form["CourseCode"];
+        AcademicRecord newAcademicRecord  = new AcademicRecord();
         foreach (var selectedValue in selectedValues)
         {
             // Process each selected checkbox value as needed
             // ...
-            // Console.WriteLine(selectedValue);
-            // Console.WriteLine(SelectedStudentId);
+             newAcademicRecord = new AcademicRecord
+            {
+                StudentId = SelectedStudentId,
+                CourseCode = Request.Form["CourseCode"]
+            };
+             AcademicRecords.Add(newAcademicRecord);
         }
-        
-        // add the new academic record to the list of academic records
-        AcademicRecord newAcademicRecord = new AcademicRecord
-        {
-            StudentId = SelectedStudentId,
-            CourseCode = Request.Form["CourseCode"]
-        };
         DataAccess.AddAcademicRecord(newAcademicRecord);
-        // Console.Write(newAcademicRecord.CourseCode+ "HEREE");
-         AcademicRecords.Add(newAcademicRecord);
-         
-        // DataAccess.GetAllAcademicRecords().Add(newAcademicRecord);
-        // AcademicRecords = DataAccess.GetAllAcademicRecords();
-        //  Console.Write(AcademicRecords.Count+ "After Post");
-        
-        
-        return RedirectToPage();
+        Console.WriteLine(AcademicRecords.Count+ "POST ..");
+
+        return RedirectToPage("Registration", new { records = AcademicRecords });
         
     }
 
-    //public IEnumerable Students { get; set; }
 }
