@@ -16,6 +16,9 @@ public class Registration : PageModel
     // ------------------------------------------------------------
     [BindProperty] 
     public string SelectedStudentId { get; set; }
+
+    public bool IsStudentSelected = false;
+    public string ErrorMessage = "";
    
     public List<SelectListItem> StudentOptions { get; set; }
     
@@ -25,22 +28,32 @@ public class Registration : PageModel
 
         // Set the selectedStudentId property based on the query parameter value
         SelectedStudentId = selectedStudentId;
-        if (selectedStudentId  != null)
+        if (selectedStudentId != null)
         {
             AcademicRecords = DataAccess.GetAcademicRecordsByStudentId(selectedStudentId);
-        }
 
+        }
+        else
+        {
+            ErrorMessage = " ";
+        }
+        
         return Page();
     }
     public IActionResult OnPostRegister(string selectedStudentId, AcademicRecord message)
     {
         StudentOptions = Students.Select(s => new SelectListItem { Value = s.StudentId, Text = s.StudentName }).ToList();
 
-        // Set the selectedStudentId property based on the query parameter value
+        // Setting the selectedStudentId property based on the query parameter value
         SelectedStudentId = selectedStudentId;
-        if (selectedStudentId  != null)
+        if (selectedStudentId != null)
         {
-             AcademicRecords = DataAccess.GetAcademicRecordsByStudentId(selectedStudentId);
+            AcademicRecords = DataAccess.GetAcademicRecordsByStudentId(selectedStudentId);
+
+        }
+        else
+        {
+            ErrorMessage = "Please select a student....";
         }
 
         return Page();
@@ -48,38 +61,31 @@ public class Registration : PageModel
     
     public IActionResult OnPostStudentSelected()
     {
-        Console.WriteLine("OnPostStudentSelected");
         var selectedValues = Request.Form["CourseCode"];
+        if (selectedValues.Count== 0 )
+        {
+            ErrorMessage = "You must select one course....";
+            // return RedirectToPage("Registration", new { selectedStudentId = SelectedStudentId });
+            return Page();
+        }
         // AcademicRecord newAcademicRecord  = new AcademicRecord();
-        AcademicRecord? newRecord = null;
         foreach (var selectedValue in selectedValues)
         {
-            // Process each selected checkbox value as needed
-            // ...
-             newRecord = new AcademicRecord
+            var newRecord = new AcademicRecord
             {
                 StudentId = SelectedStudentId,
-                CourseCode = selectedValue
+                CourseCode = selectedValue,
+                
             };
             DataAccess.AddAcademicRecord(newRecord);
-            // AcademicRecords.Add(newRecord);
-            // DataAccess.AddAcademicRecord(new AcademicRecord
-            //  {
-            //      StudentId = SelectedStudentId,
-            //      CourseCode = Request.Form["CourseCode"]
-            //  });
-             
         }
         
-        // DataAccess.AddAcademicRecord(newRecord);
-        Console.WriteLine(DataAccess.GetAcademicRecordsByStudentId(SelectedStudentId));
-         AcademicRecords = DataAccess.GetAcademicRecordsByStudentId(SelectedStudentId);
-         foreach (var record in AcademicRecords)
-         {
-             Console.WriteLine(record.CourseCode);
+        AcademicRecords = DataAccess.GetAcademicRecordsByStudentId(SelectedStudentId);
+        foreach (var record in AcademicRecords)
+        {
+            Console.WriteLine(record.CourseCode);
              
-         }
-        // DataAccess.AddAcademicRecord(newAcademicRecord);
+        }
 
         return RedirectToPage("Registration", new { selectedStudentId = SelectedStudentId });
         
