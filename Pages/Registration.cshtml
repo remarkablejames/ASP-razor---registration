@@ -7,65 +7,73 @@
 <h1>@ViewData["Title"]</h1>
 
 <div>
-    <form method="get">
-        <select asp-for="SelectedStudentId" asp-items="Model.StudentOptions">
-            <option value="">Choose a student</option>
-        </select>
-        <input type="submit" class="btn btn-primary" value="Get Registrations" />
-    </form>
-    
-    <div>
-        @if (!string.IsNullOrEmpty(Model.SelectedStudentId))
-        {
-            var selectedStudent = Model.Students.FirstOrDefault(s => s.StudentId == Model.SelectedStudentId);
-            if (selectedStudent != null)
-            {
-                    @* <p>Student Name: @selectedStudent.StudentName</p> *@
-                    @* <p>Student ID: @selectedStudent.StudentId</p> *@
-                <form method="post" asp-page-handler="Register">
-                    <input type="hidden" asp-for="SelectedStudentId" />
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>Course Code</th>
-                            <th>Course Title</th>
-                            <th>Check to register</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach (var course in Model.Courses)
-                        {
-                            <tr>
-                                <td>@course.CourseCode</td>
-                                <td>@course.CourseTitle</td>
-                                <td>
 
-                                    @if (Model.AcademicRecords.Any(r => r.CourseCode == course.CourseCode))
+    <div>
+        <form method="post">
+                    <select asp-for="SelectedStudentId" asp-items="Model.StudentOptions">
+                        <option value="">Choose a student</option>
+                    </select>
+                    <input type="submit" class="btn btn-primary" value="Get Registrations" asp-page-handler="Register" />
+                    
+                  <p id="message"></p>  
+            @if (!string.IsNullOrEmpty(Model.SelectedStudentId))
+            {
+                var selectedStudent = Model.Students.FirstOrDefault(s => s.StudentId == Model.SelectedStudentId);
+                if (selectedStudent != null)
+                {
+                    @if (Model.AcademicRecords.Count == 0)
+                    {
+                        <p>No registered courses yet!</p>
+                    }
+                    else
+                    {
+                        <p>The student is registered in the following courses</p>
+                    }
+                    <input type="hidden" asp-for="SelectedStudentId"/>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Course Code</th>
+                                <th>Course Title</th>
+                                @if (Model.AcademicRecords.Count == 0)
                                     {
-                                        <input type="checkbox" checked disabled id="CourseCode" name="CourseCode" value="@course.CourseCode"/>
+                                        <th>Check to register</th>
                                     }
-                                    else
-                                    {
-                                        <input type="checkbox" id="CourseCode" name="CourseCode" value="@course.CourseCode"/>
-                                    }
-                                    @* <input type="checkbox" /> *@
-                                </td>
+                                
                             </tr>
-                        }
-                        </tbody>
-                    </table>
-                    <input type="submit" class="btn btn-primary" value="Register"/>
-                </form>
+                            </thead>
+                            <tbody>
+                            @foreach (var course in Model.Courses)
+                            {
+                                <tr>
+                                    <td>@course.CourseCode</td>
+                                    <td>@course.CourseTitle</td>
+                                    @if (Model.AcademicRecords.Count == 0)
+                                    {
+                                        <td>
+                                            
+                                                <input type="checkbox" id="CourseCode" name="CourseCode" value="@course.CourseCode"/>
+                                            
+                                        </td>
+                                    }
+                                    
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                        <input type="submit" class="btn btn-primary" value="Register" asp-page-handler="StudentSelected" />
+
+                }
+                else
+                {
+                    <p>No student found with the selected ID.</p>
+                }
             }
             else
             {
-                <p>No student found with the selected ID.</p>
+                <p>You must select a student first</p>
             }
-        }
-        else
-        {
-            <p>No student selected.</p>
-        }
+        </form>
     </div>
 
 </div>
