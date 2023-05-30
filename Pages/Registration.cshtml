@@ -24,21 +24,14 @@
             
             @if (!Model.IsStudentSelected)
             {
-                <p class="text-danger font-monospace">@Model.ErrorMessage</p>
+                <p class="text-primary mt-4 ">@Model.ErrorMessage</p>
             }
             @if (!string.IsNullOrEmpty(Model.SelectedStudentId))
             {
                 var selectedStudent = Model.Students.FirstOrDefault(s => s.StudentId == Model.SelectedStudentId);
                 if (selectedStudent != null)
                 {
-                    @if (Model.AcademicRecords.Count == 0)
-                    {
-                        <p>This student has no registered courses yet. Select course(s) to register.</p>
-                    }
-                    else
-                    {
-                        <p class="text-primary">The student has registered the following courses</p>
-                    }
+                    
                     <input type="hidden" asp-for="SelectedStudentId"/>
                     <table class="table">
                         <thead>
