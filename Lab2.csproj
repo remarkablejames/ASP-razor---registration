@@ -15,4 +15,8 @@
       <Folder Include="data\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="SessionExtensions.cs" />
+    </ItemGroup>
+
 </Project>

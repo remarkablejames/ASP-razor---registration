@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using AcademicManagement;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering; // This is the namespace of the AcademicManagement project
-
 namespace Lab2.Pages;
 
 public class Registration : PageModel
@@ -22,6 +21,7 @@ public class Registration : PageModel
     public string msg = "";
    
     public List<SelectListItem> StudentOptions { get; set; }
+    
     
     public IActionResult OnGet(string selectedStudentId, string msg )
     {
@@ -45,6 +45,7 @@ public class Registration : PageModel
     public IActionResult OnPostRegister(string selectedStudentId, string msg)
     {
 
+        Console.WriteLine("Run: OnPostRegister ");
         StudentOptions = Students.Select(s => new SelectListItem { Value = s.StudentId, Text = s.StudentName }).ToList();
 
         // Setting the selectedStudentId property based on the query parameter value
@@ -89,6 +90,7 @@ public class Registration : PageModel
                 {
                     StudentId = SelectedStudentId,
                     CourseCode = selectedValue,
+                    
                 
                 };
                 DataAccess.AddAcademicRecord(newRecord);
@@ -96,12 +98,50 @@ public class Registration : PageModel
         
             AcademicRecords = DataAccess.GetAcademicRecordsByStudentId(SelectedStudentId);
             msg = "The student has registered for the following courses:";
-            
-            
+
+
         }
         return RedirectToPage("Registration", new { selectedStudentId = SelectedStudentId, msg = msg });
 
         
+    }
+    // ------------------------------------------------------------
+    public IActionResult OnPostSubmitGrades()
+    {
+        var selectedValues = Request.Form["CourseCode"];
+        var courseCodes = Request.Form["courseCodes"];
+        var grade = Request.Form["Grade"];
+        
+        AcademicRecords = DataAccess.GetAcademicRecordsByStudentId(SelectedStudentId);
+        foreach (var record in AcademicRecords)
+        {
+            
+            for (int i = 0; i < courseCodes.Count(); i++)
+            {
+                if (record.CourseCode == courseCodes[i])
+                {
+                    record.Grade = Convert.ToDouble(grade[i]);
+                }
+                // record.Grade = Convert.ToDouble(grade[i]);
+            }
+            
+            Console.WriteLine("--------------------");
+
+        }
+        // AcademicRecords = DataAccess.GetAcademicRecordsByStudentId(SelectedStudentId);
+        return RedirectToPage("Registration", new { selectedStudentId = SelectedStudentId, msg = msg });
+
+    }
+    
+    // ------------------------------------------------------------
+    
+    public IActionResult OnPostSort()
+    {
+        var sortBy = Request.Form["SortBy"];
+        var selectedStudentId = Request.Form["SelectedStudentId"];
+
+        return RedirectToPage("Registration", new { selectedStudentId = SelectedStudentId, msg = msg });
+
     }
 
 }

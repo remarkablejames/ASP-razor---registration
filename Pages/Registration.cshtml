@@ -42,6 +42,10 @@
                             {
                                 <th>Check to register</th>
                             }
+                            @if (Model.AcademicRecords.Count != 0)
+                            {
+                                <th class="d-flex justify-content-end align-content-end ">Grade</th>
+                            }
 
                         </tr>
                         </thead>
@@ -53,20 +57,17 @@
                                 <tr>
                                     <td>@course.CourseCode</td>
                                     <td>@course.CourseTitle</td>
-                                    @if (Model.AcademicRecords.Count == 0)
-                                    {
-                                        <td>
+                                    
+                                    <td>
 
-                                            <input type="checkbox" id="CourseCode" name="CourseCode" value="@course.CourseCode"/>
+                                        <input type="checkbox" id="CourseCode" name="CourseCode" value="@course.CourseCode"/>
 
-                                        </td>
-                                    }
+                                    </td>
 
                                 </tr>
                             }
                         }
                         @* comment *@
-                        @* another comment *@
                         else
                         {
                             @foreach (var course in Model.AcademicRecords)
@@ -74,6 +75,16 @@
                                 <tr>
                                     <td>@course.CourseCode</td>
                                     <td>@Model.Courses.Find(c => c.CourseCode == @course.CourseCode)?.CourseTitle</td>
+                                    @if(course.Grade == -100)
+                                    {
+                                        <td class="d-flex justify-content-end align-content-end"> <input type="number" class="form-control w-auto" id="Grade" name="Grade"> </td>
+                                    }
+                                    else
+                                    {
+                                        <td class="d-flex justify-content-end align-content-end "> <input type="number" class="form-control w-25" value="@course.Grade" id="Grade" name="Grade"> </td>
+                                    }
+                                    
+                                    <input type="hidden" value="@course.CourseCode" name="courseCodes" id="courseCodes"/>
 
                                 </tr>
                             }
@@ -81,7 +92,15 @@
                         
                         </tbody>
                     </table>
-                    <input type="submit" class="btn btn-primary" value="Register" asp-page-handler="StudentSelected"/>
+                    @if (Model.AcademicRecords.Count == 0)
+                    {
+                        <input type="submit" class="btn btn-primary" value="Register" asp-page-handler="StudentSelected"/>
+                    }
+                    else
+                    {
+                        <input type="submit" class="btn btn-primary" value="Submit Grades" asp-page-handler="SubmitGrades"/>
+                    }
+                    
 
                 }
                 else
