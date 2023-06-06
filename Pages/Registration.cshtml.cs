@@ -44,8 +44,7 @@ public class Registration : PageModel
     }
     public IActionResult OnPostRegister(string selectedStudentId, string msg)
     {
-        Console.WriteLine(msg + "hello");
-        
+
         StudentOptions = Students.Select(s => new SelectListItem { Value = s.StudentId, Text = s.StudentName }).ToList();
 
         // Setting the selectedStudentId property based on the query parameter value
@@ -65,7 +64,7 @@ public class Registration : PageModel
         }
         else
         {
-            ErrorMessage = "Please select a student....";
+            ErrorMessage = "You must select a student!";
         }
 
         return Page();
@@ -77,7 +76,7 @@ public class Registration : PageModel
         
         if (selectedValues.Count== 0 )
         {
-            Console.WriteLine("No course selected");
+           
             msg = "You must select at least one course!";
 
         }
@@ -96,11 +95,6 @@ public class Registration : PageModel
             }
         
             AcademicRecords = DataAccess.GetAcademicRecordsByStudentId(SelectedStudentId);
-            foreach (var record in AcademicRecords)
-            {
-                Console.WriteLine(record.CourseCode);
-             
-            }
             msg = "The student has registered for the following courses:";
             
             
