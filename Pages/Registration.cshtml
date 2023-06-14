@@ -44,7 +44,9 @@
                             }
                             @if (Model.AcademicRecords.Count != 0)
                             {
-                                <th class="d-flex justify-content-end align-content-end ">Grade</th>
+                                <th class="d-flex justify-content-end align-content-end ">
+                                    <button onclick="invokeFunction(event,'Grade')" class="btn btn-primary">Sort by Grade</button>
+                                </th>
                             }
 
                         </tr>
@@ -108,10 +110,13 @@
                     <p>No student found with the selected ID.</p>
                 }
             }
-            @* else *@
-            @* { *@
-            @*     <p class="text-danger">You must select a student first</p> *@
-            @* } *@
+            
+        </form>
+        <form id="parameterForm" method="post" >
+            <input type="hidden" id="sortParam" name="sortParam" />
+            @* get selected student *@
+            <input type="hidden" id="selectedStudentId" name="selectedStudentId" value="@Model.SelectedStudentId" />
+            <input type="submit" class="btn btn-primary d-none" id="sortBtn" value="Grades" asp-page-handler="InvokeFunction"/>
         </form>
     </div>
 
@@ -123,4 +128,11 @@
     selection.addEventListener("change", function () {
         submitBtn.click();
     });
+    function invokeFunction(event,param) {
+        event.preventDefault();
+        const sortParam = document.getElementById("sortParam");
+        sortParam.value = param;
+        const sortBtn = document.getElementById("sortBtn");
+        sortBtn.click();
+    }
 </script>

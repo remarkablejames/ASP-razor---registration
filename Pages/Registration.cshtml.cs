@@ -19,7 +19,7 @@ public class Registration : PageModel
     public bool IsStudentSelected = false;
     public string ErrorMessage = "";
     public string msg = "";
-   
+    // initialize sortBy session variable
     public List<SelectListItem> StudentOptions { get; set; }
     
     
@@ -33,6 +33,21 @@ public class Registration : PageModel
         if (selectedStudentId != null)
         {
             AcademicRecords = DataAccess.GetAcademicRecordsByStudentId(selectedStudentId);
+            
+            // sort by grade if the session variable is set
+            if (HttpContext.Session.GetString("sortBy") == "Grade")
+            {
+                AcademicRecords = AcademicRecords.OrderBy(r => r.Grade).ToList();
+            }
+            else if (HttpContext.Session.GetString("sortBy") == "CourseCode")
+            {
+                AcademicRecords = AcademicRecords.OrderBy(r => r.CourseCode).ToList();
+            }
+            else
+            {
+                AcademicRecords = AcademicRecords.OrderBy(r => r.StudentId).ToList();
+            }
+            
 
         }
         else
@@ -66,6 +81,19 @@ public class Registration : PageModel
         else
         {
             ErrorMessage = "You must select a student!";
+        }
+        // sort by grade if the session variable is set
+        if (HttpContext.Session.GetString("sortBy") == "Grade")
+        {
+            AcademicRecords = AcademicRecords.OrderBy(r => r.Grade).ToList();
+        }
+        else if (HttpContext.Session.GetString("sortBy") == "CourseCode")
+        {
+            AcademicRecords = AcademicRecords.OrderBy(r => r.CourseCode).ToList();
+        }
+        else
+        {
+            AcademicRecords = AcademicRecords.OrderBy(r => r.StudentId).ToList();
         }
 
         return Page();
@@ -101,6 +129,7 @@ public class Registration : PageModel
 
 
         }
+        
         return RedirectToPage("Registration", new { selectedStudentId = SelectedStudentId, msg = msg });
 
         
@@ -108,7 +137,6 @@ public class Registration : PageModel
     // ------------------------------------------------------------
     public IActionResult OnPostSubmitGrades()
     {
-        var selectedValues = Request.Form["CourseCode"];
         var courseCodes = Request.Form["courseCodes"];
         var grade = Request.Form["Grade"];
         
@@ -122,7 +150,6 @@ public class Registration : PageModel
                 {
                     record.Grade = Convert.ToDouble(grade[i]);
                 }
-                // record.Grade = Convert.ToDouble(grade[i]);
             }
             
             Console.WriteLine("--------------------");
@@ -135,13 +162,15 @@ public class Registration : PageModel
     
     // ------------------------------------------------------------
     
-    public IActionResult OnPostSort()
+    public IActionResult OnPostInvokeFunction(string parameterValue2, string selectedStudentId)
     {
-        var sortBy = Request.Form["SortBy"];
-        var selectedStudentId = Request.Form["SelectedStudentId"];
-
+        var parameterValue = Request.Form["sortParam"];
+        // update the session variable
+        HttpContext.Session.SetString("sortBy", parameterValue);
+        Console.WriteLine("Run: OnPostInvokeFunction");
+        Console.WriteLine("selectedStudentId: " + selectedStudentId);
         return RedirectToPage("Registration", new { selectedStudentId = SelectedStudentId, msg = msg });
-
     }
+    
 
 }
